@@ -332,21 +332,6 @@ fintrack-cloud/
 
 ---
 
-## Roadmap
-
-**In progress:** the server side of these is written, but they have no screens yet.
-- [ ] **Recurring transactions:** log rent, salary or subscriptions automatically every week or month
-- [ ] **Savings goals:** set a target (e.g. "Holiday – $2,000"), add money over time and track progress
-
-**Planned**
-- [ ] Monthly insights: this month vs last month, savings rate, top spending category
-- [ ] Multi-currency support
-- [ ] Email alerts when you go over budget
-- [ ] Receipts in cloud storage (S3 / R2)
-- [ ] Mobile navigation menu
-- [ ] Automated tests in CI
-
----
 
 ## License
 
