@@ -5,10 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
+import { API_URL } from "@/lib/api";
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (s: Record<string, unknown>) => ({
-    mode: s.mode === "signup" ? ("signup" as const) : ("login" as const),
+  validateSearch: (s: Record<string, unknown>): { mode?: "signup" | "login" } => ({
+    mode: s.mode === "signup" ? "signup" : "login",
   }),
   component: AuthPage,
 });
@@ -30,8 +31,8 @@ function AuthPage() {
 
     try {
       const url = isSignup
-        ? "http://localhost:5000/api/auth/signup"
-        : "http://localhost:5000/api/auth/login";
+        ? `${API_URL}/api/auth/signup`
+        : `${API_URL}/api/auth/login`;
 
       const body = isSignup
         ? { name, email, password }

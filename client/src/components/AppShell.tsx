@@ -2,7 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, ListOrdered, Plus, Shield, LogOut } from "lucide-react";
+import { LayoutDashboard, ListOrdered, Plus, Shield, LogOut, PiggyBank, UserRound } from "lucide-react";
 
 export function AppShell({
   children,
@@ -42,13 +42,17 @@ export function AppShell({
             <NavLink to="/dashboard" icon={<LayoutDashboard className="h-4 w-4" />}>Dashboard</NavLink>
             <NavLink to="/transactions" icon={<ListOrdered className="h-4 w-4" />}>Transactions</NavLink>
             <NavLink to="/transactions/new" icon={<Plus className="h-4 w-4" />}>New</NavLink>
+            <NavLink to="/budgets" icon={<PiggyBank className="h-4 w-4" />}>Budgets</NavLink>
             {isAdmin && (
               <NavLink to="/admin" icon={<Shield className="h-4 w-4" />}>Admin</NavLink>
             )}
           </nav>
-          <Button variant="ghost" size="sm" onClick={() => signOut()}>
-            <LogOut className="mr-2 h-4 w-4" /> Sign out
-          </Button>
+          <div className="flex items-center gap-1">
+            <NavLink to="/profile" icon={<UserRound className="h-4 w-4" />}>{user.name}</NavLink>
+            <Button variant="ghost" size="sm" onClick={() => signOut()}>
+              <LogOut className="mr-2 h-4 w-4" /> Sign out
+            </Button>
+          </div>
         </div>
       </header>
       <main className="mx-auto max-w-7xl px-6 py-10">{children}</main>

@@ -5,8 +5,9 @@ import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Download, Trash2, Search } from "lucide-react";
+import { Plus, Download, Trash2, Search, Pencil } from "lucide-react";
 import { toast } from "sonner";
+import { API_URL } from "@/lib/api";
 
 export const Route = createFileRoute("/transactions/")({
   component: () => (
@@ -35,10 +36,11 @@ function List() {
   const [status, setStatus] = useState<"all" | "normal" | "high">("all");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
+  const [sort, setSort] = useState<"date_desc" | "date_asc" | "amount_desc" | "amount_asc">("date_desc");
 
   const load = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/transactions", {
+      const res = await fetch(`${API_URL}/api/transactions`, {
         credentials: "include",
       });
 
@@ -57,16 +59,29 @@ function List() {
     return txns.filter((t) => {
       if (type !== "all" && t.type !== type) return false;
       if (status !== "all" && t.status !== status) return false;
-      if (from && t.date < from) return false;
-      if (to && t.date > to) return false;
-      if (q && !t.category.toLowerCase().includes(q.toLowerCase())) return false;
+      // t.date is a full ISO timestamp; compare only the YYYY-MM-DD part so the "to" day is inclusive
+      const day = t.date.slice(0, 10);
+      if (from && day < from) return false;
+      if (to && day > to) return false;
+      if (q) {
+        const needle = q.toLowerCase();
+        const hay = `${t.category} ${t.description ?? ""}`.toLowerCase();
+        if (!hay.includes(needle)) return false;
+      }
       return true;
+    }).sort((a, b) => {
+      if (sort === "amount_desc") return b.amount - a.amount;
+      if (sort === "amount_asc") return a.amount - b.amount;
+      const diff = new Date(a.date).getTime() - new Date(b.date).getTime();
+      return sort === "date_asc" ? diff : -diff;
     });
-  }, [txns, q, type, status, from, to]);
+  }, [txns, q, type, status, from, to, sort]);
 
   async function remove(id: string) {
+    if (!window.confirm("Delete this transaction? This cannot be undone.")) return;
+
     try {
-      const res = await fetch(`http://localhost:5000/api/transactions/${id}`, {
+      const res = await fetch(`${API_URL}/api/transactions/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -118,10 +133,10 @@ function List() {
         </div>
       </div>
 
-      <div className="grid gap-3 rounded-2xl border border-border/60 bg-card p-4 md:grid-cols-5">
+      <div className="grid gap-3 rounded-2xl border border-border/60 bg-card p-4 md:grid-cols-6">
         <div className="relative">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Search category…" className="pl-8" value={q} onChange={(e) => setQ(e.target.value)} />
+          <Input placeholder="Search category or note…" className="pl-8" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
         <Select value={type} onValueChange={(v) => setType(v as "all" | "income" | "expense")}>
           <SelectTrigger><SelectValue placeholder="Type" /></SelectTrigger>
@@ -139,8 +154,17 @@ function List() {
             <SelectItem value="high">High value</SelectItem>
           </SelectContent>
         </Select>
-        <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
-        <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
+        <Input type="date" aria-label="From date" value={from} onChange={(e) => setFrom(e.target.value)} />
+        <Input type="date" aria-label="To date" value={to} onChange={(e) => setTo(e.target.value)} />
+        <Select value={sort} onValueChange={(v) => setSort(v as typeof sort)}>
+          <SelectTrigger><SelectValue placeholder="Sort" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="date_desc">Newest first</SelectItem>
+            <SelectItem value="date_asc">Oldest first</SelectItem>
+            <SelectItem value="amount_desc">Amount: high to low</SelectItem>
+            <SelectItem value="amount_asc">Amount: low to high</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="overflow-hidden rounded-2xl border border-border/60 bg-card">
@@ -186,8 +210,13 @@ function List() {
                     <span className="text-xs text-muted-foreground">—</span>
                   )}
                 </td>
-                <td className="p-3 text-right">
-                  <Button size="sm" variant="ghost" onClick={() => remove(t.id)}>
+                <td className="whitespace-nowrap p-3 text-right">
+                  <Link to="/transactions/$id/edit" params={{ id: t.id }}>
+                    <Button size="sm" variant="ghost" aria-label="Edit transaction">
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                  <Button size="sm" variant="ghost" aria-label="Delete transaction" onClick={() => remove(t.id)}>
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
                 </td>

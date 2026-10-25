@@ -9,12 +9,21 @@ export interface IUser extends Document {
 
 const userSchema = new mongoose.Schema(
     {
-        name: String,
-        email: { type: String, unique: true },
+        name: { type: String, trim: true },
+        email: { type: String, unique: true, trim: true },
         password: String,
-        role: { type: String, default: "user" },
+        role: { type: String, enum: ["user", "admin"], default: "user" },
     },
-    { timestamps: true } // ✅ IMPORTANT
+    {
+        timestamps: true, // ✅ IMPORTANT
+        // Never leak the password hash in API responses
+        toJSON: {
+            transform: (_doc, ret: any) => {
+                delete ret.password;
+                return ret;
+            },
+        },
+    }
 );
 
 export default mongoose.model<IUser>("User", userSchema);

@@ -2,7 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/lib/auth";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { API_URL } from "@/lib/api";
 
 export const Route = createFileRoute("/admin")({
   component: () => (
@@ -12,14 +15,14 @@ export const Route = createFileRoute("/admin")({
   ),
 });
 
-interface UserRow { id: string; name: string; email: string; created_at: string }
+interface UserRow { id: string; name: string; email: string; role: "user" | "admin"; created_at: string }
 interface Txn {
   id: string; user_id: string; amount: number; type: string; category: string;
   date: string; status: string;
 }
 
 function Admin() {
-  const { isAdmin } = useAuth();
+  const { isAdmin, user } = useAuth();
   const [users, setUsers] = useState<UserRow[]>([]);
   const [txns, setTxns] = useState<Txn[]>([]);
 
@@ -28,7 +31,7 @@ function Admin() {
 
     async function fetchData() {
       try {
-        const res = await fetch("http://localhost:5000/api/admin", {
+        const res = await fetch(`${API_URL}/api/admin`, {
           credentials: "include",
         });
 
@@ -43,6 +46,24 @@ function Admin() {
 
     fetchData();
   }, [isAdmin]);
+
+  async function setRole(u: UserRow, role: "user" | "admin") {
+    if (!window.confirm(`${role === "admin" ? "Promote" : "Demote"} ${u.name} to ${role}?`)) return;
+    try {
+      const res = await fetch(`${API_URL}/api/admin/users/${u.id}/role`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ role }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      setUsers((prev) => prev.map((x) => (x.id === u.id ? { ...x, role } : x)));
+      toast.success(`${u.name} is now ${role === "admin" ? "an admin" : "a user"}`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Update failed");
+    }
+  }
 
   const userMap = new Map(users.map((u) => [u.id, u]));
   const high = txns.filter((t) => t.status === "high");
@@ -77,17 +98,29 @@ function Admin() {
           <div className="overflow-hidden rounded-2xl border border-border/60 bg-card">
             <table className="w-full text-sm">
               <thead className="border-b border-border/60 bg-secondary/40 text-left text-xs uppercase text-muted-foreground">
-                <tr><th className="p-3">Name</th><th className="p-3">Email</th><th className="p-3">Joined</th></tr>
+                <tr><th className="p-3">Name</th><th className="p-3">Email</th><th className="p-3">Role</th><th className="p-3">Joined</th><th className="p-3"></th></tr>
               </thead>
               <tbody>
                 {users.map((u) => (
                   <tr key={u.id} className="border-b border-border/40 last:border-none">
                     <td className="p-3 font-medium">{u.name}</td>
                     <td className="p-3 text-muted-foreground">{u.email}</td>
+                    <td className="p-3">
+                      {u.role === "admin"
+                        ? <span className="rounded-full bg-primary/20 px-2 py-0.5 text-xs text-primary">ADMIN</span>
+                        : <span className="text-xs text-muted-foreground">user</span>}
+                    </td>
                     <td className="p-3 text-muted-foreground">{new Date(u.created_at).toLocaleDateString()}</td>
+                    <td className="p-3 text-right">
+                      {u.id !== user?._id && (
+                        <Button size="sm" variant="outline" onClick={() => setRole(u, u.role === "admin" ? "user" : "admin")}>
+                          {u.role === "admin" ? "Remove admin" : "Make admin"}
+                        </Button>
+                      )}
+                    </td>
                   </tr>
                 ))}
-                {users.length === 0 && <tr><td colSpan={3} className="p-8 text-center text-muted-foreground">No users.</td></tr>}
+                {users.length === 0 && <tr><td colSpan={5} className="p-8 text-center text-muted-foreground">No users.</td></tr>}
               </tbody>
             </table>
           </div>

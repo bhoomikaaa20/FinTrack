@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { API_URL } from "@/lib/api";
 
 type Role = "admin" | "user";
 
@@ -27,7 +28,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // ✅ FIX: reusable function
   async function refreshUser() {
     try {
-      const res = await fetch("http://localhost:5000/api/auth/me", {
+      const res = await fetch(`${API_URL}/api/auth/me`, {
         credentials: "include",
       });
 
@@ -54,7 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = async () => {
-    await fetch("http://localhost:5000/api/auth/logout", {
+    await fetch(`${API_URL}/api/auth/logout`, {
       method: "POST",
       credentials: "include",
     });

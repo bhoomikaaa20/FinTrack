@@ -9,16 +9,29 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as BudgetsRouteImport } from './routes/budgets'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TransactionsIndexRouteImport } from './routes/transactions.index'
 import { Route as TransactionsNewRouteImport } from './routes/transactions.new'
+import { Route as TransactionsIdEditRouteImport } from './routes/transactions.$id.edit'
 
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BudgetsRoute = BudgetsRouteImport.update({
+  id: '/budgets',
+  path: '/budgets',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -46,31 +59,45 @@ const TransactionsNewRoute = TransactionsNewRouteImport.update({
   path: '/transactions/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TransactionsIdEditRoute = TransactionsIdEditRouteImport.update({
+  id: '/transactions/$id/edit',
+  path: '/transactions/$id/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/budgets': typeof BudgetsRoute
   '/dashboard': typeof DashboardRoute
+  '/profile': typeof ProfileRoute
   '/transactions/new': typeof TransactionsNewRoute
   '/transactions/': typeof TransactionsIndexRoute
+  '/transactions/$id/edit': typeof TransactionsIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/budgets': typeof BudgetsRoute
   '/dashboard': typeof DashboardRoute
+  '/profile': typeof ProfileRoute
   '/transactions/new': typeof TransactionsNewRoute
   '/transactions': typeof TransactionsIndexRoute
+  '/transactions/$id/edit': typeof TransactionsIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/budgets': typeof BudgetsRoute
   '/dashboard': typeof DashboardRoute
+  '/profile': typeof ProfileRoute
   '/transactions/new': typeof TransactionsNewRoute
   '/transactions/': typeof TransactionsIndexRoute
+  '/transactions/$id/edit': typeof TransactionsIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -78,43 +105,69 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/budgets'
     | '/dashboard'
+    | '/profile'
     | '/transactions/new'
     | '/transactions/'
+    | '/transactions/$id/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin'
     | '/auth'
+    | '/budgets'
     | '/dashboard'
+    | '/profile'
     | '/transactions/new'
     | '/transactions'
+    | '/transactions/$id/edit'
   id:
     | '__root__'
     | '/'
     | '/admin'
     | '/auth'
+    | '/budgets'
     | '/dashboard'
+    | '/profile'
     | '/transactions/new'
     | '/transactions/'
+    | '/transactions/$id/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
+  BudgetsRoute: typeof BudgetsRoute
   DashboardRoute: typeof DashboardRoute
+  ProfileRoute: typeof ProfileRoute
   TransactionsNewRoute: typeof TransactionsNewRoute
   TransactionsIndexRoute: typeof TransactionsIndexRoute
+  TransactionsIdEditRoute: typeof TransactionsIdEditRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/budgets': {
+      id: '/budgets'
+      path: '/budgets'
+      fullPath: '/budgets'
+      preLoaderRoute: typeof BudgetsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -152,6 +205,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TransactionsNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/transactions/$id/edit': {
+      id: '/transactions/$id/edit'
+      path: '/transactions/$id/edit'
+      fullPath: '/transactions/$id/edit'
+      preLoaderRoute: typeof TransactionsIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -159,9 +219,12 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
+  BudgetsRoute: BudgetsRoute,
   DashboardRoute: DashboardRoute,
+  ProfileRoute: ProfileRoute,
   TransactionsNewRoute: TransactionsNewRoute,
   TransactionsIndexRoute: TransactionsIndexRoute,
+  TransactionsIdEditRoute: TransactionsIdEditRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
