@@ -51,7 +51,7 @@ export const processDueRecurring = async (userId: string) => {
             if (!claimed) break; // another request already handled it
 
             await Transaction.create({
-                user: rule.user,
+                user: userId,
                 amount: rule.amount,
                 type: rule.type,
                 category: rule.category,

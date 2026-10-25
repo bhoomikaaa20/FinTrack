@@ -9,6 +9,7 @@ export interface ITransaction extends Document {
     status: "normal" | "high";
     description: String,
     file_url: String,
+    recurring?: mongoose.Types.ObjectId;
 }
 
 const transactionSchema = new mongoose.Schema({
