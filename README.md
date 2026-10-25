@@ -28,7 +28,7 @@ Built end-to-end in **TypeScript**: React 19 + TanStack Start on the frontend, N
 - [Security & privacy](#security--privacy)
 - [Challenges & how I solved them](#challenges--how-i-solved-them)
 - [Project structure](#project-structure)
-- [Roadmap](#roadmap)
+
 
 ---
 
@@ -333,6 +333,3 @@ fintrack-cloud/
 ---
 
 
-## License
-
-MIT
