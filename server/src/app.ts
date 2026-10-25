@@ -8,6 +8,8 @@ import transactionRoutes from "./routes/transaction.routes";
 import adminRoutes from "./routes/admin.routes";
 import uploadRoutes from "./routes/upload.routes";
 import budgetRoutes from "./routes/budget.routes";
+import recurringRoutes from "./routes/recurring.routes";
+import goalRoutes from "./routes/goal.routes";
 import { clientOrigins } from "./config/env";
 
 const app = express();
@@ -42,6 +44,8 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/budgets", budgetRoutes);
+app.use("/api/recurring", recurringRoutes);
+app.use("/api/goals", goalRoutes);
 app.use("/uploads", uploadRoutes);
 app.use("/api/admin", adminRoutes);
 

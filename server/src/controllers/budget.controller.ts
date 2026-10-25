@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import Budget from "../models/Budget";
 import Transaction from "../models/Transaction";
 import { AuthRequest } from "../middleware/auth.middleware";
+import { safeProcessDueRecurring } from "./recurring.controller";
 
 // Transaction dates are stored as UTC midnight, so month boundaries are UTC too
 const monthRange = (d: Date) => ({
@@ -35,6 +36,8 @@ export const checkBudget = async (userId: string, category: string, date: Date) 
 };
 
 export const getBudgets = async (req: AuthRequest, res: Response) => {
+    await safeProcessDueRecurring(req.user.id);
+
     const [budgets, spend] = await Promise.all([
         Budget.find({ user: req.user.id }).sort({ category: 1 }),
         monthlySpendByCategory(req.user.id),

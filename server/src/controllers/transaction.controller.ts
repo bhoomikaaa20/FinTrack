@@ -6,6 +6,7 @@ import Transaction from "../models/Transaction";
 import { AuthRequest } from "../middleware/auth.middleware";
 import { uploadsDir } from "../config/env";
 import { checkBudget } from "./budget.controller";
+import { safeProcessDueRecurring } from "./recurring.controller";
 
 const HIGH_VALUE_THRESHOLD = 50000;
 
@@ -25,6 +26,7 @@ const formatTxn = (t: any) => ({
     description: t.description,
     file_url: t.file_url,
     status: t.status,
+    recurring: Boolean(t.recurring),
 });
 
 // Shared validation for create + update. Returns an error message or the cleaned fields.
@@ -62,6 +64,9 @@ const budgetAlertFor = (userId: string, txn: any) =>
 
 // ✅ GET ALL
 export const getTransactions = async (req: AuthRequest, res: Response) => {
+    // Log any recurring entries that have come due since the last visit
+    await safeProcessDueRecurring(req.user.id);
+
     const txns = await Transaction.find({ user: req.user.id }).sort({ date: -1 });
 
     res.json({ transactions: txns.map(formatTxn) });
