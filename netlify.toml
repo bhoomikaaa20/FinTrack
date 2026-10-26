@@ -7,11 +7,9 @@
 [build.environment]
   # @tanstack/react-start requires Node >= 22.12 (older Node fails the build)
   NODE_VERSION = "22"
-  # Render API URL baked into the bundle at build time (client/.env is git-ignored)
-  VITE_API_URL = "https://fintrack-cloud-jzp1.onrender.com"
+  # "/" makes the app call the API on its own origin (/api/...), which Netlify
+  # proxies to Render — see client/public/_redirects
+  VITE_API_URL = "/"
 
-# SPA fallback so deep links like /dashboard work on refresh
-[[redirects]]
-  from   = "/*"
-  to     = "/index.html"
-  status = 200
+# Redirect and proxy rules live in client/public/_redirects (Netlify applies
+# that file before netlify.toml, so keeping them in one place avoids conflicts).
