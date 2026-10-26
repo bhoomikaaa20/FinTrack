@@ -142,18 +142,35 @@ Every transaction and budget belongs to one user, and users can only ever see th
 
 ### 1. Start the API
 
+Create (or edit) `server/.env`:
+
+```env
+PORT=5000
+MONGO_URI=mongodb://localhost:27017/trading-app
+JWT_SECRET=replace-with-a-long-random-string
+CLIENT_URL=http://localhost:8080
+```
+
+Then run:
+
 ```bash
 cd server
-cp .env.example .env      # set MONGO_URI and a long random JWT_SECRET
 npm install
 npm run dev               # → http://localhost:5000  (health check: /api/health)
 ```
 
 ### 2. Start the frontend
 
+Create (or edit) `client/.env`:
+
+```env
+VITE_API_URL=http://localhost:5000
+```
+
+Then run:
+
 ```bash
 cd client
-cp .env.example .env      # VITE_API_URL=http://localhost:5000
 npm install
 npm run dev               # → http://localhost:8080
 ```
@@ -258,7 +275,7 @@ Financial data is sensitive, so the app protects it by default:
 | Requests forged by other sites (CSRF) | SameSite cookies plus an allow-list check on the request's origin |
 | Unsafe uploads | Images and PDFs only, 5 MB max |
 | Access lingering after a change | Roles are checked against the database on every request, so a removed or deleted account loses access straight away |
-| Leaked secrets | `.env` files are git-ignored; `.env.example` lists what's needed |
+| Leaked secrets | `.env` files are git-ignored, so credentials never reach GitHub; the variables needed are listed in [Getting started](#getting-started) |
 
 ---
 
