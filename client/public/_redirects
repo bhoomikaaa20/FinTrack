@@ -1,0 +1,2 @@
+# SPA fallback: let the client-side router handle every path
+/*    /index.html   200

@@ -1,0 +1,11 @@
+# Netlify settings for the frontend (the API is deployed separately on Render)
+[build]
+  base    = "client"
+  command = "npm run build"
+  publish = "dist/client"
+
+# SPA fallback so deep links like /dashboard work on refresh
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200

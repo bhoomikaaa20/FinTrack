@@ -344,7 +344,7 @@ fintrack-cloud/
 ## Deployment notes
 
 - **API** (Render, Railway, Fly.io or a VPS): set `NODE_ENV=production`, `MONGO_URI`, `JWT_SECRET`, `CLIENT_URL=https://your-frontend.app` and `API_PUBLIC_URL=https://your-api.app`. HTTPS is required.
-- **Frontend** (Cloudflare, Vercel or Netlify): set `VITE_API_URL=https://your-api.app` when building.
+- **Frontend** (Netlify): the repo includes a `netlify.toml` (base `client`, build `npm run build`, publish `dist/client`, plus an SPA fallback so deep links work). In **Site configuration → Environment variables**, add `VITE_API_URL=https://your-api.onrender.com`; `.env` is git-ignored, so Netlify can't read it. Then trigger a redeploy.
 - **Receipts** are stored on the API server's disk (`server/uploads`). On hosts that wipe the disk on redeploy, attach persistent storage or move receipts to S3 / Cloudflare R2.
 
 ---
