@@ -1,6 +1,6 @@
 <div align="center">
 
-# 💰 FinTrack Cloud
+# 💰 FinTrack 
 
 **A full-stack personal finance tracker: log income and expenses, stay within monthly budgets, and keep every receipt in one secure place.**
 
