@@ -393,15 +393,6 @@ fintrack-cloud/
 
 ---
 
-## 🗺 Roadmap
-
-- [ ] Frontend pages for **savings goals** and **recurring transactions** (the API is ready)
-- [ ] Move receipt storage to S3 / Cloudflare R2
-- [ ] Multi-currency support
-- [ ] Automated tests (Vitest + Supertest) and a CI pipeline
-
----
-
 ## 🧑‍💻 Author
 
 **Bhoomika Somavarapu** · [GitHub @bhoomikaaa20](https://github.com/bhoomikaaa20)
