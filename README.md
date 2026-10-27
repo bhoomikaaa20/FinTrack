@@ -16,7 +16,6 @@
 ![Netlify](https://img.shields.io/badge/Netlify-00C7B7?logo=netlify&logoColor=white)
 ![Render](https://img.shields.io/badge/Render-46E3B7?logo=render&logoColor=black)
 
-![FinTrack Cloud dashboard](docs/screenshots/dashboard.png)
 
 </div>
 
