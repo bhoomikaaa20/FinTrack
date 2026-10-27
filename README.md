@@ -1,178 +1,277 @@
-# FinTrack Cloud
+<div align="center">
 
-**A personal finance tracker that helps you see where your money goes, stay within your monthly budgets, and keep every receipt in one place.**
+# 💰 FinTrack Cloud
 
-FinTrack Cloud is a full-stack web app for managing your own money. You log your income and expenses, attach receipts, set a spending limit for each category, and the dashboard shows how you're doing this month and over the last six months.
+**A full-stack personal finance tracker: log income and expenses, stay within monthly budgets, and keep every receipt in one secure place.**
 
-Built end-to-end in **TypeScript**: React 19 + TanStack Start on the frontend, Node.js + Express 5 + MongoDB on the backend.
+[**🌐 Live Demo**](https://personnal-fintrack.netlify.app) · [Features](#-features) · [Screenshots](#-screenshots) · [Architecture](#-architecture) · [Run locally](#-getting-started)
 
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
 ![React](https://img.shields.io/badge/React_19-20232A?logo=react&logoColor=61DAFB)
+![TanStack](https://img.shields.io/badge/TanStack_Start-FF4154?logo=reactquery&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_v4-06B6D4?logo=tailwindcss&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-339933?logo=nodedotjs&logoColor=white)
 ![Express](https://img.shields.io/badge/Express_5-000000?logo=express&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?logo=mongodb&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_v4-06B6D4?logo=tailwindcss&logoColor=white)
+![Netlify](https://img.shields.io/badge/Netlify-00C7B7?logo=netlify&logoColor=white)
+![Render](https://img.shields.io/badge/Render-46E3B7?logo=render&logoColor=black)
+
+![FinTrack Cloud dashboard](docs/screenshots/dashboard.png)
+
+</div>
 
 ---
 
-## Table of contents
+## 📌 At a glance
 
-- [Why I built this](#why-i-built-this)
-- [What it does](#what-it-does)
-- [How you use it](#how-you-use-it)
-- [Tech stack](#tech-stack)
-- [Architecture](#architecture)
-- [Getting started](#getting-started)
-- [Viewing your data in MongoDB Compass](#viewing-your-data-in-mongodb-compass)
-- [Admin access](#admin-access)
-- [API reference](#api-reference)
-- [Security & privacy](#security--privacy)
-- [Challenges & how I solved them](#challenges--how-i-solved-them)
-- [Project structure](#project-structure)
+| | |
+|---|---|
+| **What** | A web app where each user manages their own money: transactions, receipts, category budgets and a visual dashboard |
+| **Stack** | React 19 + TanStack Start + Tailwind (frontend), Node.js + Express 5 + MongoDB (backend), all in **TypeScript** |
+| **Hosting** | Frontend on **Netlify**, API on **Render**, database on **MongoDB Atlas** |
+| **Auth** | JWT in an HttpOnly cookie, bcrypt hashing, user and admin roles |
+| **Highlights** | Instant over-budget alerts, private receipt storage, CSV export, admin panel, and security hardening (CSRF, rate limiting, NoSQL injection protection) |
 
+### What this project demonstrates
+
+- **Full-stack ownership:** I designed and built the REST API, data model, authentication, frontend and deployment myself.
+- **Production deployment:** two hosting providers connected through a same-origin proxy so sign-in works in browsers that block third-party cookies (Safari, Brave, incognito).
+- **Security thinking:** I found and fixed real vulnerabilities, including password hashes leaking in API responses, login bypass through NoSQL injection, and publicly readable receipts ([details below](#-challenges--how-i-solved-them)).
+- **Clean code:** strict TypeScript on both sides, one form component shared by add and edit, and one validator shared by create and update.
 
 ---
 
-## Why I built this
+## 🖼 Screenshots
+
+| Landing page | Sign in / Sign up |
+|---|---|
+| ![Landing page](docs/screenshots/landing.png) | ![Authentication](docs/screenshots/auth.png) |
+
+| Dashboard | Transactions |
+|---|---|
+| ![Dashboard](docs/screenshots/dashboard.png) | ![Transactions list](docs/screenshots/transactions.png) |
+
+| Add / edit transaction | Budgets |
+|---|---|
+| ![Transaction form](docs/screenshots/transaction-form.png) | ![Budgets](docs/screenshots/budgets.png) |
+
+| Over-budget alert | Admin panel |
+|---|---|
+| ![Budget alert](docs/screenshots/budget-alert.png) | ![Admin panel](docs/screenshots/admin.png) |
+
+---
+
+## 🎯 Why I built this
 
 Keeping track of personal spending is harder than it should be:
 
-- **You only notice overspending after it's happened.** Bank statements tell you at the end of the month that you spent too much on food, when it's too late to change anything.
-- **Receipts get lost.** They end up in your inbox, your camera roll or a drawer, separate from the payments they belong to.
-- **Spreadsheets take effort.** You have to build your own formulas and charts, and they don't warn you about anything.
-- **Unusual payments blend in.** One very large payment looks the same as a coffee in a long list.
-
-## What it does
+- **You notice overspending too late.** A bank statement tells you at the end of the month that you overspent on food, when you can no longer do anything about it.
+- **Receipts get lost** in your inbox, your camera roll or a drawer, away from the payments they belong to.
+- **Spreadsheets take effort.** You have to build the formulas and charts yourself, and they never warn you.
+- **Unusual payments blend in.** In a long list, one very large payment looks the same as a coffee.
 
 | The problem | How FinTrack Cloud helps |
 | ----------- | ------------------------ |
-| Not knowing where your money goes | A dashboard showing total income, expenses and balance, a 6-month income vs expenses chart, and a breakdown of spending by category |
-| Overspending without noticing | Set a **monthly budget per category** (e.g. Food: $400). Progress bars show how much you've used, and you get an **instant warning** the moment an expense takes you over the limit |
-| Lost receipts | Attach a photo or PDF receipt to any transaction. Receipts are private to your account |
-| Large payments slipping by | Any transaction over **$50,000** is automatically flagged **HIGH** so it stands out |
-| Finding old transactions | Search by category or note, filter by type, status and date range, and sort by date or amount |
-| Getting data out | Export your filtered transactions to **CSV** for taxes, a spreadsheet or your accountant |
-
-### Feature list
-
-- **Account:** sign up, sign in, update your name, change your password
-- **Transactions:** add, **edit** and delete income or expenses, with amount, category, date, note and an optional receipt
-- **Receipts:** upload, replace or remove an image or PDF (up to 5 MB) on any transaction
-- **Dashboard:** income, expenses, balance, transaction count, 6-month trend, spending by category, budget progress
-- **Budgets:** one monthly limit per expense category; green → amber (80% used) → red (over budget)
-- **Budget alerts:** a warning appears as soon as a new or edited expense pushes a category over its limit
-- **High-value flag:** transactions over $50,000 are marked **HIGH**, and the flag updates if you edit the amount
-- **Search, filter, sort and CSV export** on the transactions page
-- **Admin panel** for whoever runs the app: number of users and transactions, and promoting or removing other admins
+| Not knowing where your money goes | A dashboard with total income, expenses and balance, a 6-month income vs expenses chart, and spending by category |
+| Overspending without noticing | A **monthly budget per category**, progress bars, and an **instant warning** as soon as an expense goes over the limit |
+| Lost receipts | Attach a photo or PDF receipt to any transaction. Only you can see it |
+| Large payments slipping by | Transactions over **$50,000** are automatically flagged **HIGH** |
+| Finding old transactions | Search, filter by type, status and date range, and sort by date or amount |
+| Getting data out | Export filtered transactions to **CSV** |
 
 ---
 
-## How you use it
+## ✨ Features
+
+- **Accounts:** sign up, sign in, sign out, update your name, change your password
+- **Transactions:** add, edit and delete income or expenses (amount, category, date, note, optional receipt)
+- **Receipts:** upload, replace or remove an image or PDF (max 5 MB); only the owner can view them
+- **Dashboard:** income, expenses, balance, transaction count, 6-month trend chart, spending by category, budget progress, recent activity
+- **Budgets:** one monthly limit per expense category, with a colour scale: green, then amber at 80%, then red when over budget
+- **Budget alerts:** a warning toast the moment a new or edited expense pushes a category over its limit
+- **High-value flag:** transactions over $50,000 are marked **HIGH**, and the flag updates when the amount changes
+- **Search, filter, sort and CSV export** on the transactions page
+- **Admin panel:** user and transaction counts, flagged activity, and promoting or demoting admins
+- **API only, no UI yet:** savings **goals** with contributions, and **recurring** weekly or monthly transactions
+
+### How a user uses it
 
 1. **Create an account** and sign in.
-2. **Add your transactions**: your salary as income, and rent, groceries and so on as expenses. Attach a receipt if you have one.
-3. **Set budgets** for the categories you want to keep an eye on, such as Food, Transport or Entertainment.
-4. **Check the dashboard** to see your balance, your monthly trend, where most of your money goes, and how close you are to each budget.
-5. **Edit or delete** anything you entered wrongly; totals and budgets update automatically.
-6. **Export to CSV** whenever you need your records outside the app.
+2. **Add transactions:** salary as income; rent and groceries as expenses. Attach receipts.
+3. **Set budgets** for the categories you want to watch (Food, Transport, Entertainment and so on).
+4. **Check the dashboard** for your balance, trend, top spending categories and budget usage.
+5. **Edit or delete** mistakes. Totals and budgets recalculate automatically.
+6. **Export to CSV** for taxes, a spreadsheet or your accountant.
 
 ---
 
-## Tech stack
+## 🛠 Tech stack
 
 | Layer    | Technology |
 | -------- | ---------- |
-| Frontend | React 19, TanStack Start / Router (file-based routing), Tailwind CSS v4, shadcn/ui (Radix), Sonner toasts, Lucide icons, Vite 7 |
+| Frontend | React 19, TanStack Start / Router (file-based routing), Tailwind CSS v4, shadcn/ui (Radix), Recharts, React Hook Form + Zod, Sonner toasts, Lucide icons, Vite 7 |
 | Backend  | Node.js, Express 5, TypeScript, Mongoose 9 |
-| Database | MongoDB |
-| Auth     | JWT in an HttpOnly cookie, bcrypt password hashing, user / admin roles |
-| Uploads  | Multer (file type and size checks) |
+| Database | MongoDB Atlas |
+| Auth     | JWT in an HttpOnly cookie, bcryptjs password hashing, role-based access (user / admin) |
+| Uploads  | Multer with file type and size checks |
 | Security | helmet, express-rate-limit, CORS allow-list, CSRF origin check |
+| Hosting  | Netlify (frontend + API proxy), Render (API), MongoDB Atlas (database) |
 
 ---
 
-## Architecture
+## 🏗 Architecture
 
 ```mermaid
 flowchart LR
     subgraph Browser
-        UI["React app<br/>Dashboard · Transactions · Budgets · Profile"]
+        UI["React app<br/>Dashboard · Transactions · Budgets · Profile · Admin"]
     end
 
-    subgraph API["Express API"]
+    subgraph Netlify
+        STATIC["Static frontend<br/>(SPA)"]
+        PROXY["/api/* and /uploads/*<br/>proxy rewrite"]
+    end
+
+    subgraph Render["Render: Express API"]
         MW["Security middleware<br/>helmet · CORS · CSRF check · rate limit"]
         AUTH["verifyUser<br/>(session cookie + role from DB)"]
-        CTRL["Controllers<br/>auth · transactions · budgets · admin"]
+        CTRL["Controllers<br/>auth · transactions · budgets · goals · recurring · admin"]
         UP["Receipt uploads<br/>(image / PDF, 5 MB)"]
     end
 
-    DB[(MongoDB<br/>users · transactions · budgets)]
+    DB[(MongoDB Atlas<br/>users · transactions · budgets · goals · recurring)]
     FS[[uploads/<br/>private receipts]]
 
-    UI -- "HTTPS + HttpOnly cookie" --> MW --> AUTH --> CTRL
+    UI --> STATIC
+    UI -- "same-origin HTTPS + HttpOnly cookie" --> PROXY --> MW --> AUTH --> CTRL
     CTRL --> DB
     CTRL --> UP --> FS
 ```
 
-**What happens when you add an expense**
+**Why the proxy?** The browser only ever talks to `personnal-fintrack.netlify.app`. Netlify forwards `/api/*` to Render, so the session cookie is **first-party**. Browsers that block third-party cookies therefore don't break sign-in.
 
-1. You fill in the form and press **Save**; the browser sends the data and receipt along with your session cookie.
-2. The API checks who you are and validates every field.
+### What happens when you add an expense
+
+1. You fill in the form and press **Save**. The browser sends the fields and the receipt along with your session cookie.
+2. The API identifies you from the cookie and validates every field.
 3. The receipt is saved under a random, unguessable filename.
-4. The transaction is saved and flagged **HIGH** if it's over $50,000.
-5. The API adds up what you've spent in that category this month. If that's over your budget, the response includes a `budget_alert`.
-6. The app shows "Transaction saved" and, if needed, an "Over budget" warning.
+4. The transaction is saved, with a **HIGH** flag if it's over $50,000.
+5. A MongoDB aggregation adds up this month's spending in that category. If it's over budget, the response includes a `budget_alert`.
+6. The UI shows "Transaction saved" and, if needed, an "Over budget" warning.
 
 ### Data model
 
 ```
 User         { name, email, password (hashed), role: "user" | "admin", createdAt }
 Transaction  { user, amount, type: "income" | "expense", category, date, description, file_url, status: "normal" | "high" }
-Budget       { user, category, limit }   // one per category per user, applies every month
+Budget       { user, category, limit }                 // one per category per user, applies every month
+Goal         { user, name, target, saved, deadline? }  // savings target
+Recurring    { user, amount, type, category, frequency: "weekly" | "monthly", anchor_day, next_date, active }
 ```
 
-Every transaction and budget belongs to one user, and users can only ever see their own data.
+Every record belongs to one user, and users can only ever see their own data.
 
 ---
 
-## Getting started
+## 🔐 Security & privacy
+
+| Risk | Protection |
+| ---- | ---------- |
+| Seeing other users' transactions | Every query is scoped to the signed-in user; other users get "not found" |
+| Opening someone's receipts | Receipts are served only to their owner (or an admin), under random filenames |
+| Stolen passwords | bcrypt hashing; the hash is never returned by the API |
+| Password guessing | Auth routes are rate-limited (20 failed attempts per 15 minutes) |
+| Account enumeration | Sign-in shows the same "Invalid email or password" message either way |
+| NoSQL injection login bypass | Login fields must be plain strings before they reach the database |
+| Session theft through XSS | The session is in an HttpOnly cookie that JavaScript can't read |
+| Cross-site request forgery | SameSite cookies plus an allow-list check on the request's `Origin` |
+| Unsafe uploads | Images and PDFs only, 5 MB max |
+| Stale permissions | Roles are read from the database on every request, so changes apply immediately |
+| Leaked secrets | `.env` files are git-ignored |
+
+---
+
+## 🧩 Challenges & how I solved them
+
+**1. Instant budget warnings without extra infrastructure**
+*Problem:* A warning only helps if it appears while you're adding the expense, but notifications or background jobs would add a lot of moving parts.
+*Solution:* After saving an expense, the API runs one MongoDB aggregation for that category and month and returns the result in the same response. The warning appears with no extra request.
+
+**2. Password hashes were included in API responses**
+*Problem:* Sign-up and sign-in returned the whole user document, hash included.
+*Solution:* The User model removes `password` from every JSON serialisation, so no endpoint can leak it.
+
+**3. Signing in without a password**
+*Problem:* Sending `{"email": {"$ne": null}}` turned the login lookup into "match any user".
+*Solution:* All auth inputs are checked to be plain strings before they're used in a query.
+
+**4. Receipts were publicly viewable**
+*Problem:* Anyone with a receipt's link could open it.
+*Solution:* Receipts are served through an authenticated route that checks ownership. Filenames are random, and files are deleted together with their transaction or when replaced.
+
+**5. Sign-in failed in production but worked locally**
+*Problem:* With the frontend on Netlify and the API on Render, the session cookie was third-party. Safari, Brave and incognito windows silently dropped it.
+*Solution:* Netlify now proxies `/api/*` and `/uploads/*` to Render (`client/public/_redirects`), so the browser treats the API as same-origin and the cookie as first-party.
+
+**6. "Origin not allowed" errors in production**
+*Problem:* The CSRF guard compares the request's `Origin` against `CLIENT_URL`. A small difference such as a trailing slash rejected every POST.
+*Solution:* Configured origins are normalised (trimmed, trailing slashes removed) before the comparison.
+
+**7. The date filter left out the last day**
+*Problem:* Comparing full timestamps with plain dates dropped transactions on the "to" date.
+*Solution:* Only the `YYYY-MM-DD` part is compared, so both ends of the range are included.
+
+**8. Role changes needed a fresh sign-in**
+*Problem:* The role was stored in the JWT, so a database change had no effect for up to 7 days.
+*Solution:* The role is loaded from the database on each request.
+
+**9. Keeping the add and edit forms in sync**
+*Solution:* One shared `TransactionForm` component powers both pages, and one shared validator checks both create and update requests on the server.
+
+---
+
+## 🚀 Getting started
 
 ### Prerequisites
-- Node.js 20+
-- MongoDB, either installed locally or a free MongoDB Atlas cluster
+- Node.js **22+** (required by TanStack Start)
+- MongoDB, either local or a free [MongoDB Atlas](https://www.mongodb.com/atlas) cluster
 
-### 1. Start the API
+### 1. Clone
 
-Create (or edit) `server/.env`:
+```bash
+git clone https://github.com/bhoomikaaa20/fintrack-cloud.git
+cd fintrack-cloud
+```
+
+### 2. Start the API
+
+Create `server/.env`:
 
 ```env
 PORT=5000
-MONGO_URI=mongodb://localhost:27017/trading-app
+MONGO_URI=mongodb://localhost:27017/fintrack
 JWT_SECRET=replace-with-a-long-random-string
 CLIENT_URL=http://localhost:8080
 ```
 
-Then run:
-
 ```bash
 cd server
 npm install
-npm run dev               # → http://localhost:5000  (health check: /api/health)
+npm run dev               # http://localhost:5000  (health check: /api/health)
 ```
 
-### 2. Start the frontend
+### 3. Start the frontend
 
-Create (or edit) `client/.env`:
+Create `client/.env`:
 
 ```env
 VITE_API_URL=http://localhost:5000
 ```
 
-Then run:
-
 ```bash
 cd client
 npm install
-npm run dev               # → http://localhost:8080
+npm run dev               # http://localhost:8080
 ```
 
 Open http://localhost:8080, create an account and add your first transaction.
@@ -181,58 +280,54 @@ Open http://localhost:8080, create an account and add your first transaction.
 
 | Variable | Where | Description |
 | -------- | ----- | ----------- |
-| `MONGO_URI` | server | MongoDB connection string; the last part of the path is the database name |
-| `JWT_SECRET` | server | Secret used to sign login sessions (required) |
-| `PORT` | server | API port (default `5000`) |
-| `CLIENT_URL` | server | Frontend address(es) allowed to call the API (default `http://localhost:8080`) |
-| `API_PUBLIC_URL` | server | Public API address used in receipt links (defaults to the request host) |
-| `NODE_ENV` | server | `production` turns on secure cookies for HTTPS |
-| `VITE_API_URL` | client | Address of the API |
+| `MONGO_URI` | server | MongoDB connection string (the last path segment is the database name) |
+| `JWT_SECRET` | server | Secret for signing sessions (required) |
+| `PORT` | server | API port (default `5000`; set automatically on Render) |
+| `CLIENT_URL` | server | Comma-separated frontend origins allowed to call the API |
+| `API_PUBLIC_URL` | server | Public base URL used in receipt links |
+| `NODE_ENV` | server | `production` enables secure cookies |
+| `VITE_API_URL` | client | API base URL (`/` in production, so requests go through the Netlify proxy) |
 
 ### Scripts
 
 | Location | Command | Purpose |
 | -------- | ------- | ------- |
-| server | `npm run dev` | Run the API with hot reload |
-| server | `npm run build` then `npm start` | Build and run in production |
-| server | `npm run typecheck` | Check types |
+| server | `npm run dev` | API with hot reload |
+| server | `npm run build` then `npm start` | Production build and run |
+| server | `npm run typecheck` | Type check |
 | server | `npm run make-admin -- <email>` | Give an account admin access |
-| client | `npm run dev` | Run the frontend |
+| client | `npm run dev` | Frontend dev server |
 | client | `npm run build` | Production build |
 
 ---
 
-## Viewing your data in MongoDB Compass
+## ☁️ Deployment
 
-The database name is the last part of your `MONGO_URI`:
+| Part | Platform | Settings |
+|---|---|---|
+| API | **Render** (Web Service) | Root `server` · Build `npm install --include=dev && npm run build` · Start `npm start` · Env: `NODE_ENV=production`, `MONGO_URI`, `JWT_SECRET`, `CLIENT_URL` and `API_PUBLIC_URL` = the Netlify URL |
+| Frontend | **Netlify** | Configured by [`netlify.toml`](netlify.toml): base `client`, build `npm run build`, publish `dist/client`, Node 22, `VITE_API_URL=/` |
+| Proxy | **Netlify** | [`client/public/_redirects`](client/public/_redirects) forwards `/api/*` and `/uploads/*` to Render and adds the SPA fallback |
+| Database | **MongoDB Atlas** | Network access `0.0.0.0/0` so Render can connect |
 
-| `MONGO_URI` | Database name |
-| ----------- | ------------- |
-| `mongodb://localhost:27017/fintrack` | `fintrack` |
-| `mongodb+srv://user:pass@cluster0.xxx.mongodb.net/fintrack?retryWrites=true` | `fintrack` |
-| `mongodb+srv://user:pass@cluster0.xxx.mongodb.net/?retryWrites=true` | `test` (MongoDB's default) |
-
-Connect Compass with the same URI and open that database. Your data is in the **`users`**, **`transactions`** and **`budgets`** collections.
-
----
-
-## Admin access
-
-FinTrack Cloud is a personal tracker: every account only sees its own money. The **admin role** is for whoever runs the app, so they can see how many people use it and spot flagged high-value activity.
-
-New accounts are always regular users. The app reads the role from the database on every request, so a change takes effect as soon as the user refreshes the page. There are three ways to make someone an admin:
-
-1. **MongoDB Compass / Atlas** (works in production): in the `users` collection, change the account's `role` from `"user"` to `"admin"`.
-2. **Command line:** `cd server && npm run make-admin -- you@example.com`
-3. **In the app:** an existing admin opens **Admin → Users** and clicks **Make admin**.
-
-Use option 1 or 2 to create the first admin.
+> Receipts are stored on the API server's disk. Render's free tier wipes the disk on every redeploy, so production storage should use a persistent disk or S3 / Cloudflare R2.
 
 ---
 
-## API reference
+## 👑 Admin access
 
-All responses are JSON. Logged-in routes use the `token` HttpOnly cookie (send requests with `credentials: "include"`).
+New accounts are always regular users. To create the first admin:
+
+1. **MongoDB Atlas / Compass:** in the `users` collection, set `role` to `"admin"`, or
+2. **CLI:** `cd server && npm run make-admin -- you@example.com`
+
+After that, an admin can promote other users from **Admin → Users**. Roles are checked on every request, so a refresh is enough.
+
+---
+
+## 📡 API reference
+
+All responses are JSON. Signed-in routes use the `token` HttpOnly cookie (`credentials: "include"`).
 
 | Method | Endpoint | Access | Description |
 | ------ | -------- | ------ | ----------- |
@@ -244,80 +339,38 @@ All responses are JSON. Logged-in routes use the `token` HttpOnly cookie (send r
 | PATCH | `/api/auth/password` | signed in | Change password `{ currentPassword, newPassword }` |
 | GET | `/api/transactions` | signed in | List your transactions |
 | GET | `/api/transactions/:id` | owner | Get one transaction |
-| POST | `/api/transactions` | signed in | Add a transaction (multipart: `amount, type, category, date, description, file?`) |
-| PUT | `/api/transactions/:id` | owner | Edit (same fields, plus optional `remove_file=true`) |
+| POST | `/api/transactions` | signed in | Create (multipart: `amount, type, category, date, description, file?`) |
+| PUT | `/api/transactions/:id` | owner | Update (same fields, plus optional `remove_file=true`) |
 | DELETE | `/api/transactions/:id` | owner | Delete the transaction and its receipt |
-| GET | `/api/budgets` | signed in | Your budgets with this month's spending |
+| GET | `/api/budgets` | signed in | Budgets with this month's spending |
 | PUT | `/api/budgets` | signed in | Create or update `{ category, limit }` |
 | DELETE | `/api/budgets/:id` | owner | Remove a budget |
+| GET | `/api/goals` | signed in | List savings goals |
+| POST | `/api/goals` | signed in | Create `{ name, target, deadline? }` |
+| POST | `/api/goals/:id/contribute` | owner | Add money to a goal |
+| DELETE | `/api/goals/:id` | owner | Delete a goal |
+| GET | `/api/recurring` | signed in | List recurring rules |
+| POST | `/api/recurring` | signed in | Create a weekly or monthly rule |
+| PATCH | `/api/recurring/:id` | owner | Update or pause a rule |
+| DELETE | `/api/recurring/:id` | owner | Delete a rule |
 | GET | `/uploads/:filename` | owner or admin | View a receipt |
 | GET | `/api/admin` | admin | All users and transactions |
 | PATCH | `/api/admin/users/:id/role` | admin | Set `{ role: "user" \| "admin" }` |
 | GET | `/api/health` | public | Health check |
 
-Adding or editing a transaction returns `budget_alert: { category, limit, spent }` when the expense takes that category over budget, otherwise `null`.
+Creating or updating an expense returns `budget_alert: { category, limit, spent }` when that category goes over budget, otherwise `null`.
 
 ---
 
-## Security & privacy
-
-Financial data is sensitive, so the app protects it by default:
-
-| Risk | Protection |
-| ---- | ---------- |
-| Someone seeing your transactions | Every query is limited to your own account; other users get "not found" |
-| Someone opening your receipts | Receipts are only served to their owner (or an admin), and filenames are random |
-| Stolen passwords | Passwords are hashed with bcrypt and the hash is never sent back by the API |
-| Password guessing | Sign-in, sign-up and password change are rate-limited (20 failed attempts per 15 minutes) |
-| Finding out who has an account | Sign-in shows the same "Invalid email or password" message either way |
-| Login bypass via NoSQL injection | All login fields must be plain text before reaching the database |
-| Session theft through scripts (XSS) | The session lives in an HttpOnly cookie that JavaScript can't read |
-| Requests forged by other sites (CSRF) | SameSite cookies plus an allow-list check on the request's origin |
-| Unsafe uploads | Images and PDFs only, 5 MB max |
-| Access lingering after a change | Roles are checked against the database on every request, so a removed or deleted account loses access straight away |
-| Leaked secrets | `.env` files are git-ignored, so credentials never reach GitHub; the variables needed are listed in [Getting started](#getting-started) |
-
----
-
-## Challenges & how I solved them
-
-**1. Budget warnings needed to be instant without adding complexity**
-*Problem:* A warning is only useful when it appears while you're adding the expense, but notification systems and background jobs would add a lot of moving parts.
-*Solution:* After saving an expense, the API runs one MongoDB aggregation for that category and month and returns the result in the same response, so the warning appears straight away with no extra request.
-
-**2. Password hashes were included in API responses**
-*Problem:* Sign-up and sign-in returned the full user record, hash included.
-*Solution:* The User model strips the password from every JSON response, so no endpoint can leak it, now or in future.
-
-**3. It was possible to sign in without a password**
-*Problem:* Sending `{"email": {"$ne": null}}` turned the login lookup into "match any user".
-*Solution:* All login fields are checked to be plain strings before they're used in a query.
-
-**4. Receipts were publicly viewable**
-*Problem:* Anyone with a receipt's link could open it.
-*Solution:* Receipts go through a signed-in route that checks the file belongs to you. Filenames are random, and files are deleted when you delete the transaction or replace the receipt.
-
-**5. The date filter left out the last day**
-*Problem:* Comparing full timestamps with plain dates as text dropped transactions on the "to" date.
-*Solution:* Only the date part (`YYYY-MM-DD`) is compared, so both ends of the range are included.
-
-**6. Role changes didn't apply until the user signed in again**
-*Problem:* The role was stored inside the login token, so changing it in the database did nothing for up to 7 days.
-*Solution:* The role is loaded from the database on each request, so a change applies as soon as the page is refreshed.
-
-**7. Keeping the add and edit forms consistent**
-*Problem:* Two copies of the same form tend to drift apart.
-*Solution:* One shared `TransactionForm` component powers both pages, and one shared validator checks both the create and update requests on the server.
-
----
-
-## Project structure
+## 📁 Project structure
 
 ```
 fintrack-cloud/
+├── netlify.toml                         # Netlify build config
 ├── client/                              # React frontend
+│   ├── public/_redirects                # API proxy + SPA fallback
 │   └── src/
-│       ├── routes/                      # One file per page
+│       ├── routes/                      # One file per page (file-based routing)
 │       │   ├── index.tsx                #   Landing page
 │       │   ├── auth.tsx                 #   Sign in / sign up
 │       │   ├── dashboard.tsx            #   Overview, trend, categories, budgets
@@ -327,26 +380,31 @@ fintrack-cloud/
 │       │   ├── budgets.tsx              #   Monthly budgets
 │       │   ├── profile.tsx              #   Name and password
 │       │   └── admin.tsx                #   Admin panel
-│       ├── components/                  # AppShell, TransactionForm, BudgetBar, UI kit
-│       └── lib/                         # Auth context, API URL, constants, toasts
+│       ├── components/                  # AppShell, TransactionForm, BudgetBar, shadcn/ui kit
+│       └── lib/                         # Auth context, API client, constants
 └── server/                              # Express API
     └── src/
         ├── config/                      # Environment + database connection
-        ├── controllers/                 # auth, transactions, budgets, admin
-        ├── middleware/                  # Login check, admin check, uploads
-        ├── models/                      # User, Transaction, Budget
-        ├── routes/                      # API routes + private receipts
-        └── scripts/make-admin.ts        # Give an account admin access
+        ├── controllers/                 # auth, transactions, budgets, goals, recurring, admin
+        ├── middleware/                  # Auth check, admin check, uploads
+        ├── models/                      # User, Transaction, Budget, Goal, Recurring
+        ├── routes/                      # REST routes + private receipts
+        └── scripts/make-admin.ts        # CLI: give an account admin access
 ```
 
 ---
 
-## Deployment notes
+## 🗺 Roadmap
 
-- **API** (Render, Railway, Fly.io or a VPS): set `NODE_ENV=production`, `MONGO_URI`, `JWT_SECRET`, `CLIENT_URL=https://your-frontend.app` and `API_PUBLIC_URL=https://your-api.app`. HTTPS is required.
-- **Frontend** (Netlify): the repo includes a `netlify.toml` (base `client`, build `npm run build`, publish `dist/client`, plus an SPA fallback so deep links work). In **Site configuration → Environment variables**, add `VITE_API_URL=https://your-api.onrender.com`; `.env` is git-ignored, so Netlify can't read it. Then trigger a redeploy.
-- **Receipts** are stored on the API server's disk (`server/uploads`). On hosts that wipe the disk on redeploy, attach persistent storage or move receipts to S3 / Cloudflare R2.
+- [ ] Frontend pages for **savings goals** and **recurring transactions** (the API is ready)
+- [ ] Move receipt storage to S3 / Cloudflare R2
+- [ ] Multi-currency support
+- [ ] Automated tests (Vitest + Supertest) and a CI pipeline
 
 ---
 
+## 🧑‍💻 Author
 
+**Bhoomika Somavarapu** · [GitHub @bhoomikaaa20](https://github.com/bhoomikaaa20)
+
+If you like this project, consider giving it a ⭐.
