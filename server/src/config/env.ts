@@ -5,7 +5,7 @@ export const isProd = process.env.NODE_ENV === "production";
 // Comma-separated list of allowed frontend origins
 export const clientOrigins = (process.env.CLIENT_URL || "http://localhost:8080")
     .split(",")
-    .map((o) => o.trim())
+    .map((o) => o.trim().replace(/\/+$/, ""))
     .filter(Boolean);
 
 export const uploadsDir = path.join(__dirname, "../../uploads");
